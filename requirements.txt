@@ -1,3 +1,4 @@
 opencv-python-headless
 matplotlib
 icrawler
+numpy
