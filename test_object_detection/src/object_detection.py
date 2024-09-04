@@ -33,7 +33,7 @@ def detect_and_outline(image_path, classifier_path, output_path):
 
 
 if __name__ == "__main__":
-    img_path = "resources/images/sign1.png"
-    classifier_path = "resources/stop_signs.xml"
-    output_path = "output/output_image.png"  # Adjusted to match the volume mount
+    img_path = "../resources/images/sign3.png"
+    classifier_path = "../resources/stop_signs.xml"
+    output_path = "output/output_image.png"
     detect_and_outline(img_path, classifier_path, output_path)
