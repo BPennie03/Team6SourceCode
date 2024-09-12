@@ -4,20 +4,14 @@
 
 To get started, follow the instructions below.
 
-### Prerequisites
-- [Docker](https://www.docker.com/get-started) installed on your machine.
+### Download Dependencies
+*Requirements.txt is global, so if you already ran it for `red_circle_detection`, you can skip this part*
 
-## Running the Docker container
-Run using `./run.sh` in terminal
+* `pip install -r requirements.txt`
 
-### OR
+### Run the Script(s)
+*Make sure you are inside of `/test_object_detection/src/` when running either of the following commands*
 
-Build the Docker Image:
-```bash
-docker build -t test-object-detection .
-```
+* `python object_detection.py`
 
-Run the Docker Container:
-```bash
-docker run -it --rm -v $(pwd)/src/output:/src/output test-object-detection
-```
+* `python sample_image_collector.py`
