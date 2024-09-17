@@ -21,32 +21,30 @@ def detect_and_outline(input_path, classifier_path, output_path):
     """
 
     """ use .walk() or .crawl() to iterate through all images in usb drive"""
-    """use an if statement to check for .png file type"""
-    print(f'Processing image: {image_path}')
+    for root, dirs, files in os.walk(input_path):
+        for filename in files:
+            if filename.endswith(".png"):
+                print(f'Processing image: {os.path.join(root, filename)}')
     
-    img = cv2.imread(image_path)
-    img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                img = cv2.imread(os.path.join(root, filename))
+                img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
                 classifier = cv2.CascadeClassifier(classifier_path)
 
-    found = classifier.detectMultiScale(img_gray, minSize=(20, 20))
-    """put found images in new folder, not crop"""
-    if len(found) != 0:
-        for (x, y, width, height) in found:
-            cv2.rectangle(img_rgb, (x, y), (x + height,
-                          y + width), (0, 255, 0), 5)
+                found = classifier.detectMultiScale(img_gray, minSize=(20, 20))
+                # """put found images in new folder, not crop shutilmove"""
+                if len(found) != 0:
+                    plt.imshow(img_rgb)
+                    plt.axis('off')
 
-                plt.imshow(img_rgb)
-                plt.axis('off')
-
-
-                plt.savefig(output_path + get_next_filename("output_image"))
-                print(f'Output image saved to: {output_path}')
+                    output_image_path = get_next_filename(output_path +"output_image")
+                    plt.savefig(output_image_path)
+                    print(f'Output image saved to: {output_image_path}')
 
 
 if __name__ == "__main__":
-    img_path = "resources/images/"
-    classifier_path = "resources/stop_signs.xml"
-    output_path = "output/"  # Adjusted to match the volume mount
+    img_path = os.getcwd()[:len(os.getcwd())-3] + "resources/images"
+    classifier_path = os.getcwd()[:len(os.getcwd())-3] + "resources/stop_signs.xml"
+    output_path = os.getcwd() + "/output/"  # Adjusted to match the volume mount
     detect_and_outline(img_path, classifier_path, output_path)
