@@ -1,5 +1,4 @@
 import os
-import re
 import utils
 from ultralytics import YOLO
 
