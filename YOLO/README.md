@@ -8,7 +8,13 @@
 5. Verify output files: `YOLO/runs/detect/predict/`
 
 ### Fixing pathing errors
-If you get an error about pathing inside the "Ultralytics/settings.json" for "datasets_dir", "weights_dir", or "runs_dir" - edit the settings.json and fix the paths, then re-run
+If you get this error:
+```
+Dataset 'data.yaml' images not found , missing path 'insert/path/here'
+Note dataset download directory is 'insert/path/here'. You can update this in 'insert/path/here\Ultralytics\settings.json'
+```
+
+Simply update the paths inside the specified `settings.json` to reflect the proper project locations:
 
 *example: `vim /absolute/path/to/Ultralytics/settings.json`*
 ```bash
