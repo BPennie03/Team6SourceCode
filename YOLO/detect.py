@@ -2,6 +2,7 @@ import argparse
 import os
 import utils
 from ultralytics import YOLO
+import shutil
 
 
 def get_model():
@@ -14,7 +15,17 @@ def detect(dir_path='test_images'):
     results = model.predict(dir_path, show_boxes=False, imgsz=640, conf=0.7)
     for r in results:
         if r.boxes:
-            r.save()
+            r.save(conf=False, boxes=False)
+            move_results_files()
+
+
+def move_results_files(src_dir='.', dest_dir='detect_results'):
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+    for file_name in os.listdir(src_dir):
+        if file_name.startswith('results_'):
+            shutil.move(os.path.join(src_dir, file_name),
+                        os.path.join(dest_dir, file_name))
 
 
 if __name__ == "__main__":
