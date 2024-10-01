@@ -11,13 +11,10 @@ def get_model():
 
 def detect(dir_path='test_images'):
     model = get_model()
-    for file in os.listdir(dir_path):
-        model.predict(f'{dir_path}/{file}', save=True, imgsz=640, conf=0.7)
-
-
-def single_detect(file_path):
-    model = get_model()
-    model.predict(file_path, save=True, imgsz=640, conf=0.7)
+    results = model.predict(dir_path, show_boxes=False, imgsz=640, conf=0.7)
+    for r in results:
+        if r.boxes:
+            r.save()
 
 
 if __name__ == "__main__":
@@ -27,7 +24,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     test_input = args.f
-    if os.path.isdir(test_input):
-        detect(test_input)
-    else:
-        single_detect(test_input)
+    detect(test_input)
