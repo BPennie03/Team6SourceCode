@@ -1,20 +1,31 @@
 import argparse
 import shutil
-from ultralytics import YOLO
 import os
 import utils
 import red_circle_detect
+from ultralytics import YOLO
+
 
 DETECT_DIR = 'output/detect_results/'
 
 
 def get_model():
+    """Gets the most recent YOLO model
+
+    Returns:
+        YOLO: Most recent yolo model
+    """
     model_path = utils.get_most_recent_version('train', 'runs/detect')
     print(f"Using model from {model_path}")
     return YOLO(f'{model_path}/weights/best.pt')
 
 
-def detect(dir_path='test_images'):
+def detect(dir_path='resources'):
+    """Detects objects in images in the specified directory
+
+    Args:
+        dir_path (str, optional): path to test images directory, defaults to 'resources'.
+    """
     model = get_model()
     results = model.predict(dir_path, show_boxes=False, imgsz=640, conf=0.7)
     for r in results:
@@ -25,6 +36,12 @@ def detect(dir_path='test_images'):
 
 
 def move_results_files(src_dir='.', dest_dir=DETECT_DIR):
+    """Moves the results files to the output directory
+
+    Args:
+        src_dir (str, optional): source directory, defaults to '.'.
+        dest_dir (str optional): directory to move files to, defaults to DETECT_DIR.
+    """
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
     for file_name in os.listdir(src_dir):
@@ -34,6 +51,11 @@ def move_results_files(src_dir='.', dest_dir=DETECT_DIR):
 
 
 def clear_output_dir(dir_path=DETECT_DIR):
+    """Clears the output directory
+
+    Args:
+        dir_path (str, optional): directory to clear, defaults to DETECT_DIR.
+    """
     if os.path.exists(dir_path):
         shutil.rmtree(dir_path)
 
