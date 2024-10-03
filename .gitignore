@@ -164,7 +164,7 @@ cython_debug/
 test_object_detection/src/output
 test_object_detection/resources/images/samples
 red_circle_detection/resources/cropped_images
-YOLO/detect_results
+YOLO/output
 
 # YOLO output/cache
 YOLO/runs
