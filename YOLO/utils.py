@@ -1,5 +1,4 @@
 import os
-import re
 
 
 def get_most_recent_version(base_name, directory='.') -> str:
