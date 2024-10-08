@@ -48,6 +48,7 @@ def move_results_files(src_dir='.', dest_dir=DETECT_DIR):
         if file_name.startswith('results_'):
             shutil.move(os.path.join(src_dir, file_name),
                         os.path.join(dest_dir, file_name))
+    shutil.make_archive('detect_results', 'zip', dest_dir)
 
 
 def clear_output_dir(dir_path=DETECT_DIR):
