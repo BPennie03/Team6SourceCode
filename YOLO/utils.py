@@ -1,4 +1,5 @@
 import os
+import shutil
 
 
 def get_most_recent_version(base_name, directory='.') -> str:
@@ -24,3 +25,13 @@ def get_most_recent_version(base_name, directory='.') -> str:
         dirs, key=lambda d: os.path.getmtime(os.path.join(directory, d)))
 
     return os.path.join(directory, most_recent_dir)
+
+
+def clear_output_dir(dir_path):
+    """Clears the output directory
+
+    Args:
+        dir_path (str, optional): directory to clear
+    """
+    if os.path.exists(dir_path):
+        shutil.rmtree(dir_path)

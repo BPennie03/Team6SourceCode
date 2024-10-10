@@ -2,18 +2,21 @@ import cv2
 import numpy as np
 import os
 
-# Function to detect red circles and crop the images
-
 
 def detect_and_crop(image_path):
-    print(f"Processing image: {image_path}")
+    """Function to detect red circles in an image and crop them
 
+    Args:
+        image_path (str): path to the image to process
+    """
+
+    print(f"Processing image: {image_path}")
     original_image = cv2.imread(image_path)
     if original_image is None:
         print(f"Could not read image {image_path}")
         return
 
-    # Convert original image to BGR, since Lab is only available from BGR
+    # Convert original image to BGR
     captured_frame_bgr = cv2.cvtColor(original_image, cv2.COLOR_BGRA2BGR)
 
     # First blur to reduce noise prior to color space conversion
@@ -47,11 +50,11 @@ def detect_and_crop(image_path):
             cropped_image = original_image[y:y+h, x:x+w]
 
             # Skip small images
-            if cropped_image.shape[:2] < (50, 50):
+            if cropped_image.shape[:2] < (25, 25):
                 continue
 
             # Resize the cropped image to a fixed size
-            cropped_image = cv2.resize(cropped_image, (100, 100))
+            cropped_image = cv2.resize(cropped_image, (200, 200))
 
             # Save the cropped image with a new name
             filename = os.path.basename(image_path)
@@ -59,7 +62,7 @@ def detect_and_crop(image_path):
             cropped_filename = f"{name}_cropped_{idx}{ext}"
 
             # Create folder if it doesn't exist
-            folder = os.path.join(os.path.dirname(__file__), '../output/red_circle_results/')
+            folder = os.path.join('output/red_circle_results/')
             os.makedirs(folder, exist_ok=True)
 
             # Save cropped image in the "cropped images" folder
@@ -70,15 +73,18 @@ def detect_and_crop(image_path):
 
 
 def process_images(dir_path):
+    """Function to process all images in a directory by passing them into the detect_and_crop function
+
+    Args:
+        dir_path (str): path to the directory containing images
+    """
+
     if os.path.exists(dir_path):
         files = os.listdir(dir_path)
 
     # Filter only image files
     image_files = [file for file in files if file.endswith(
         ('.png', '.jpg', '.jpeg', '.webp'))]
-
-    # sort the files in ascending order using natural sorting (idk how tf this works)
-    # image_files.sort(key=lambda x: int(''.join(filter(str.isdigit, x))))
 
     # Process each image
     for image_file in image_files:

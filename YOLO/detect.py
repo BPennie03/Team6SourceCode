@@ -30,8 +30,8 @@ def detect(dir_path='resources'):
     results = model.predict(dir_path, show_boxes=False, imgsz=640, conf=0.7)
     for r in results:
         if r.boxes:  # if the result has a bounding box
-            # r.save(conf=False, boxes=False)
-            r.save()
+            r.save(conf=False, boxes=False)
+            # r.save()
             move_results_files()
 
 
@@ -48,17 +48,7 @@ def move_results_files(src_dir='.', dest_dir=DETECT_DIR):
         if file_name.startswith('results_'):
             shutil.move(os.path.join(src_dir, file_name),
                         os.path.join(dest_dir, file_name))
-    shutil.make_archive('detect_results', 'zip', dest_dir)
-
-
-def clear_output_dir(dir_path=DETECT_DIR):
-    """Clears the output directory
-
-    Args:
-        dir_path (str, optional): directory to clear, defaults to DETECT_DIR.
-    """
-    if os.path.exists(dir_path):
-        shutil.rmtree(dir_path)
+    # shutil.make_archive('detect_results', 'zip', dest_dir)
 
 
 if __name__ == "__main__":
@@ -68,6 +58,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     test_input = args.f
-    clear_output_dir()
+    utils.clear_output_dir(DETECT_DIR)
     detect(test_input)
-    # red_circle_detect.process_images(DETECT_DIR) will fix this later
+
+    red_circle_detect.process_images(DETECT_DIR)  # will fix this later
