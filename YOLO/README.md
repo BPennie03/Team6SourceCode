@@ -1,4 +1,13 @@
 # How to use YOLOv8
+[Documentation](https://docs.ultralytics.com/)
+
+## Usage
+### train.py
+* `python3 train.py`
+
+### detect.py
+* `python3 detect.py`
+* `python3 detect.py -f {file_path}`
 
 ## Training/Testing a model
 1. Install Ultralytics (YOLO): 
@@ -8,12 +17,12 @@
    - *This is required for each person as output files/models are fairly large and not included on git*
    - Update params as desired/needed. *See section at bottom of page.*
    - If you train multiple times, you will have multiple output models in the `runs/detect/` directory: "train", "train2", etc. Don't worry about adjusting pathing if that is the case, the script should automatically train with the most recent created model
-3. Add any images you want to test into the `test_images` directory (*if desired*)
+3. Add any images you want to test into the `resources` directory (*if desired*)
 4. Run `python3 detect.py` to run detection **after** model is trained
    - `detect.py` defaults to performing detection on every image in the `test_images` directory. 
    - An optional argument, `-f`, allows you to path to a specific file, which is helpful for testing a single image/file or an alternate directory. 
-   - *example: `python3 detect.py -f path/to/file`*
-5. View output files: `YOLO/runs/detect/predict/`
+   - *example: `python3 detect.py -f {file_path}`*
+5. View output files: `output/detect_results/`
 
 ### Fixing pathing errors
 If you get this error:
