@@ -2,7 +2,7 @@ import os
 import shutil
 
 
-def get_most_recent_version(base_name, directory='.') -> str:
+def get_most_recent_version(base_name, directory='.'):
     """Function taken from GPT to get the most recent version of a directory/file. 
     This is helpful if you train mutilple times to get the most recent pathing for 
     the training files without having to manually update the calls
