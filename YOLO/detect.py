@@ -28,7 +28,8 @@ def detect(dir_path='resources'):
     model = get_model()
     results = model.predict(dir_path, show_boxes=False, imgsz=640, conf=0.1)
     for r in results:
-        if r.boxes:  # if the result has a bounding box
+        # if the result has a bounding box (an object was detected)
+        if r.boxes:
             r.save(conf=False, boxes=False)
             # r.save()
             move_results_files()
@@ -58,5 +59,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     test_input = args.f
+    if not os.path.exists(test_input):
+        print(f'Provided input path ({test_input}) does not exist')
+        exit()  # terminate the script if the input path does not exist
+
     utils.clear_output_dir(DETECT_DIR)
     detect(test_input)
