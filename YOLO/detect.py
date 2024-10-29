@@ -2,7 +2,6 @@ import argparse
 import shutil
 import os
 import utils
-import red_circle_detect
 from ultralytics import YOLO
 
 
@@ -27,7 +26,7 @@ def detect(dir_path='resources'):
         dir_path (str, optional): path to test images directory, defaults to 'resources'.
     """
     model = get_model()
-    results = model.predict(dir_path, show_boxes=False, imgsz=640, conf=0.7)
+    results = model.predict(dir_path, show_boxes=False, imgsz=640, conf=0.1)
     for r in results:
         if r.boxes:  # if the result has a bounding box
             r.save(conf=False, boxes=False)
@@ -61,5 +60,3 @@ if __name__ == "__main__":
     test_input = args.f
     utils.clear_output_dir(DETECT_DIR)
     detect(test_input)
-
-    red_circle_detect.process_images(DETECT_DIR)  # will fix this later
