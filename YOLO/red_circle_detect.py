@@ -45,6 +45,7 @@ def detect_and_crop(image_path):
     if contours:
 
         num_circles = len(contours)
+        print(f"{num_circles} red circle(s) found in {image_path}\n")
 
         for idx, contour in enumerate(contours):
             # Get the bounding box of the contour
@@ -52,10 +53,6 @@ def detect_and_crop(image_path):
 
             # Crop the original image using the bounding box
             cropped_image = original_image[y:y+h, x:x+w]
-
-            #! Skip small images, not needed if our "circles" are dots...
-            # if cropped_image.shape[:2] < (25, 25):
-            #     continue
 
             # Resize the cropped image to a fixed size
             cropped_image = cv2.resize(cropped_image, (200, 200))
@@ -75,10 +72,8 @@ def detect_and_crop(image_path):
     else:
         print(f"No red circle found in {image_path}\n")
 
-    print(f"{num_circles} red circle(s) found in {image_path}\n")
 
-
-def process_images(dir_path):
+def process_images(dir_path=DETECT_DIR):
     """Function to process all images in a directory by passing them into the detect_and_crop function
 
     Args:
@@ -101,7 +96,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     test_input = args.f
-    utils.clear_output_dir(DETECT_DIR)
+    utils.clear_output_dir('output/red_circle_results/')
 
     print('Starting red circle detection...')
     print('=====================================')
