@@ -168,3 +168,7 @@ YOLO/runs
 
 # Mac moment
 .DS_Store
+
+# Other files
+temp.py
+image_storage/
