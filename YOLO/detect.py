@@ -20,19 +20,26 @@ def get_model():
 
 
 def detect(dir_path='resources'):
-    """Detects objects in images in the specified directory
+    """Detects objects in images in the specified directory. Only saves the 10
+    images with the highest confidence
 
     Args:
         dir_path (str, optional): path to test images directory, defaults to 'resources'.
     """
+    highest_conf = []
+
     model = get_model()
-    results = model.predict(dir_path, show_boxes=False, imgsz=640, conf=0.1)
+    results = model.predict(dir_path, show_boxes=False, imgsz=640, conf=0.5)
+
     for r in results:
-        # if the result has a bounding box (an object was detected)
         if r.boxes:
-            r.save(conf=False, boxes=False)
-            # r.save()
-            move_results_files()
+            max_conf = max([box.conf for box in r.boxes])
+            highest_conf.append((max_conf, r))
+
+    highest_conf = sorted(highest_conf, key=lambda x: x[0], reverse=True)[:10]
+    for _, result in highest_conf:
+        result.save()
+        move_results_files()
 
 
 def move_results_files(src_dir='.', dest_dir=DETECT_DIR):
