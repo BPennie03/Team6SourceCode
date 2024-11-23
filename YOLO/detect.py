@@ -38,7 +38,8 @@ def detect(dir_path='resources'):
 
     highest_conf = sorted(highest_conf, key=lambda x: x[0], reverse=True)[:10]
     for _, result in highest_conf:
-        result.save()
+        # result.save()
+        result.save(conf=False, boxes=False)
         move_results_files()
 
 
