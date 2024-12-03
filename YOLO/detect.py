@@ -1,11 +1,61 @@
 import argparse
-import shutil
+import hashlib
+import io
 import os
+import serial
+import shutil
+import time
 import utils
+import zipfile
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+from Crypto.Util import Counter
 from ultralytics import YOLO
 
-
 DETECT_DIR = 'output/detect_results/'
+
+
+def folder_to_byte_array(folder_path):
+    """Converts a folder to a byte array by zipping it first."""
+
+    zip_buffer = io.BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                zip_file.write(file_path, os.path.relpath(
+                    file_path, folder_path))
+                zip_buffer.seek(0)
+
+        return zip_buffer.read()
+
+
+def encrypt_message(key, plaintext):
+    """Encrypts the given plaintext using AES CTR mode."""
+
+    # Generate a random 16-byte initialization vector (IV)
+    iv = os.urandom(16)
+
+    # Create a counter object for CTR mode
+    ctr = Counter.new(128, initial_value=int.from_bytes(iv, 'big'))
+
+    # Create the AES cipher object
+    cipher = AES.new(key, AES.MODE_CTR, counter=ctr)
+
+    # Encrypt the plaintext
+    ciphertext = cipher.encrypt(plaintext)
+
+    # Return the IV and ciphertext as bytes
+    return iv + ciphertext
+
+
+def add_md5_checksum(byte_array):
+    # Calculate the MD5 hash of the byte array
+    md5_hash = hashlib.md5(byte_array).digest()
+
+    # Append the MD5 hash to the original byte array
+    return byte_array + md5_hash
 
 
 def get_model():
@@ -57,7 +107,7 @@ def move_results_files(src_dir='.', dest_dir=DETECT_DIR):
             shutil.move(os.path.join(src_dir, file_name),
                         os.path.join(dest_dir, file_name))
     # Uncomment this to zip the results
-    # shutil.make_archive('detect_results', 'zip', dest_dir)
+    shutil.make_archive('detect_results', 'zip', dest_dir)
 
 
 if __name__ == "__main__":
@@ -73,3 +123,17 @@ if __name__ == "__main__":
 
     utils.clear_output_dir(DETECT_DIR)
     detect(test_input)
+
+    aeskey = b'\x57\xc0\xb3\x51\x20\x72\x25\xa7\xeb\x44\x7b\x62\x61\x4f\xbd\x34\xeb\xd8\xab\x1a\xd4\x5d\x00\xae\x95\x10\x51\x75\x30\x4d\x19\x8c'
+
+    ser = serial.Serial(port='/dev/ttyUSB0', baudrate=115200, parity=serial.PARITY_NONE,
+                        stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=1)
+    img_path = os.getcwd()[:len(os.getcwd())-3] + "output/detect_results/"
+
+    byte_array = folder_to_byte_array(img_path)
+
+    with_md5 = add_md5_checksum(byte_array)
+
+    encrypted = encrypt_message(aeskey, with_md5)
+    ser.write(byte_array)
+    ser.write(b'\n')
