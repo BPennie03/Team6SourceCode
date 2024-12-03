@@ -14,67 +14,68 @@ def detect_and_crop(image_path):
     Args:
         image_path (str): path to the image to process
     """
-    print(f"Processing image: {image_path}...")
+    print(f"Processing image: {image_path}")
+
     original_image = cv2.imread(image_path)
     if original_image is None:
         print(f"Could not read image {image_path}")
         return
 
-    # Convert the image to HSV color space
-    hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
+    # Convert original image to BGR, since Lab is only available from BGR
+    captured_frame_bgr = cv2.cvtColor(original_image, cv2.COLOR_BGRA2BGR)
 
-    # Define HSV range for red (covers both ends of the hue spectrum)
-    lower_red1 = np.array([0, 50, 50])   # Lower range for red
-    upper_red1 = np.array([10, 255, 255])
-    lower_red2 = np.array([170, 50, 50])  # Upper range for red
-    upper_red2 = np.array([180, 255, 255])
+    # First blur to reduce noise prior to color space conversion
+    captured_frame_bgr = cv2.medianBlur(captured_frame_bgr, 3)
 
-    mask1 = cv2.inRange(hsv_image, lower_red1, upper_red1)
-    mask2 = cv2.inRange(hsv_image, lower_red2, upper_red2)
-    red_mask = cv2.bitwise_or(mask1, mask2)
+    # Convert to Lab color space, we only need to check one channel (a-channel) for red here
+    captured_frame_lab = cv2.cvtColor(captured_frame_bgr, cv2.COLOR_BGR2Lab)
 
-    red_mask = cv2.GaussianBlur(red_mask, (5, 5), 2)
+    # Define lower and upper bounds for the red color (in HSV)
+    lower_red = np.array([10, 150, 150])
+    upper_red = np.array([190, 255, 255])
 
+    # Threshold the HSV image to get only red colors
+    mask1 = cv2.inRange(captured_frame_lab, lower_red, upper_red)
+    mask1 = cv2.GaussianBlur(mask1, (5, 5), 2, 2)
+
+    # Combine the masks
+    mask = mask1
+
+    # Find contours in the mask
     contours, _ = cv2.findContours(
-        red_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    num_circles = 0
-    for idx, contour in enumerate(contours):
-        perimeter = cv2.arcLength(contour, True)
-        area = cv2.contourArea(contour)
-        if area == 0:
-            continue
-        circularity = (4 * np.pi * area) / (perimeter * perimeter)
+    # Check if any contours are found
+    if contours:
+        for idx, contour in enumerate(contours):
+            # Get the bounding box of the contour
+            x, y, w, h = cv2.boundingRect(contour)
 
-        if 0.7 < circularity <= 1.2:
-            (x, y), radius = cv2.minEnclosingCircle(contour)
-            if radius > 10:  # Filter out small circles
-                mask_inside_circle = red_mask[int(
-                    y - radius):int(y + radius), int(x - radius):int(x + radius)]
-                inner_area = np.sum(mask_inside_circle) // 255
+            # Crop the original image using the bounding box
+            cropped_image = original_image[y:y+h, x:x+w]
 
-                if area > 2 * inner_area:
-                    num_circles += 1
+            # Skip small images
+            # if cropped_image.shape[:2] < (50, 50):
+            #     continue
 
-                    # Crop the circle region
-                    x, y, w, h = cv2.boundingRect(contour)
-                    cropped_image = original_image[y:y+h, x:x+w]
+            # Resize the cropped image to a fixed size (e.g., 100x100)
+            # Adjust the size as needed
+            cropped_image = cv2.resize(cropped_image, (100, 100))
 
-                    # Resize and save the cropped image
-                    cropped_image = cv2.resize(cropped_image, (200, 200))
-                    filename = os.path.basename(image_path)
-                    name, ext = os.path.splitext(filename)
-                    cropped_filename = f"{name}_cropped_{idx}{ext}"
-                    folder = os.path.join('output/red_circle_results/')
-                    os.makedirs(folder, exist_ok=True)
-                    cropped_image_path = os.path.join(folder, cropped_filename)
-                    cv2.imwrite(cropped_image_path, cropped_image)
+            # Save the cropped image with a new name
+            filename = os.path.basename(image_path)
+            name, ext = os.path.splitext(filename)
+            cropped_filename = f"{name}_cropped_{idx}{ext}"
 
-    # Print result
-    if num_circles > 0:
-        print(f"{num_circles} hollow red circle(s) found in {image_path}\n")
+            # Create folder if it doesn't exist
+            folder = "output/red_circle_results/"
+            os.makedirs(folder, exist_ok=True)
+
+            # Save cropped image in the "cropped images" folder
+            cropped_image_path = os.path.join(folder, cropped_filename)
+            cv2.imwrite(cropped_image_path, cropped_image)
     else:
-        print(f"No hollow red circles found in {image_path}\n")
+        print(f"No red circle found in {image_path}")
 
 
 def process_images(dir_path=DETECT_DIR):
