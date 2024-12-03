@@ -4,3 +4,6 @@ icrawler
 numpy
 argparse
 ultralytics
+pycryptodome
+hashlib
+pyserial
