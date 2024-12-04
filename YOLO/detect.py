@@ -124,8 +124,10 @@ if __name__ == "__main__":
     utils.clear_output_dir(DETECT_DIR)
     detect(test_input)
 
+    print('Starting transmission...')
     aeskey = b'\x57\xc0\xb3\x51\x20\x72\x25\xa7\xeb\x44\x7b\x62\x61\x4f\xbd\x34\xeb\xd8\xab\x1a\xd4\x5d\x00\xae\x95\x10\x51\x75\x30\x4d\x19\x8c'
 
+    print('Connecting...')
     ser = serial.Serial(port='/dev/ttyUSB0', baudrate=115200, parity=serial.PARITY_NONE,
                         stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS, timeout=1)
     img_path = os.getcwd()[:len(os.getcwd())-3] + "output/detect_results/"
@@ -135,5 +137,8 @@ if __name__ == "__main__":
     with_md5 = add_md5_checksum(byte_array)
 
     encrypted = encrypt_message(aeskey, with_md5)
+    print('Sending...')
     ser.write(byte_array)
     ser.write(b'\n')
+    print('Transmission complete')
+    ser.close()
