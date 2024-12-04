@@ -26,9 +26,9 @@ def folder_to_byte_array(folder_path):
                 file_path = os.path.join(root, file)
                 zip_file.write(file_path, os.path.relpath(
                     file_path, folder_path))
-                zip_buffer.seek(0)
 
-        return zip_buffer.read()
+    zip_buffer.seek(0)
+    return zip_buffer.read()
 
 
 def encrypt_message(key, plaintext):
